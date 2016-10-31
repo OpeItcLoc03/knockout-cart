@@ -1,6 +1,6 @@
-<button data-bind='clickWithData:addItem' data-thumb='http://placehold.it/80x80' data-title='Snolla Yearly Subscription' data-url='http://example.com/product1' data-price='149.0' data-sku='yearly'>Buy</button>
+<button data-bind='clickWithData:addItem' data-image='http://placehold.it/80x80' data-quantity='2' data-min-quantity='1' data-max-quantity='10' data-item-title='Snolla Forever Subscription' data-title='Snolla Yearly Subscription' data-url='http://example.com/product1' data-price='149.0' data-id='yearly'>Buy</button>
 
-<button data-bind='clickWithData:addItem' data-thumb='http://placehold.it/80x80' data-title='Snolla Forever Subscription' data-url='http://example.com/product2' data-price='10000.0' data-sku='forever'>Buy</button>
+<button data-bind='clickWithData:addItem' data-image='http://placehold.it/80x80' data-title='Snolla Forever Subscription' data-item-title='Snolla Forever Subscription' data-url='http://example.com/product2' data-price='10000.0' data-id='forever'>Buy</button>
 
 <h4>Your Cart</h4>
 <div data-bind='visible : hasItems' id='cart' style="display: none;">
@@ -17,7 +17,7 @@
       <tr>
         <td  width='200'>
           <a data-bind="attr: { href: url }">
-            <img data-bind="attr: { src: thumb, alt: title }" />
+            <img data-bind="attr: { src: image, alt: title }" />
           </a>
           <a data-bind="attr: { href: url }, text: title"></a></td>
         <td>
@@ -29,7 +29,7 @@
         <td>
           <a data-bind='click:$parent.removeClicked' href='#'>
             <icon class='icon-remove'></icon>
-            <input data-bind='value:sku' name='items[][sku]' type='hidden'>
+            <input data-bind='value:id' name='items[][id]' type='hidden'>
             <input data-bind='value:quantity' name='items[][qty]' type='hidden'>
           </a>
         </td>

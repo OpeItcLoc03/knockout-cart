@@ -4,10 +4,11 @@ Snolla.CartItem = function(options, callback){
   var cartItem = {};
   var qty = (options.quantity || 1);
   cartItem.price = options.price || 0.00;
-  
+  cartItem.id = options.id || "";
   cartItem.quantity = ko.observable(qty).asPositiveInteger(1);
-  cartItem.sku = options.sku || "";
-  cartItem.thumb = options.thumb || "";
+  cartItem.minQuantity = options.minQuantity || 1;
+  cartItem.maxQuantity = options.maxQuantity || NaN;
+  cartItem.image = options.image || "";
   cartItem.url = options.url || "";
   cartItem.title = options.title || "";
   cartItem.description = options.description || "";
@@ -56,7 +57,7 @@ Snolla.Cart = function(){
 
 
   self.addItem = function(item){
-    var existing = self.find(item.sku);
+    var existing = self.find(item.id);
     var items = self.items();
 
     if(existing){
@@ -73,14 +74,14 @@ Snolla.Cart = function(){
     return self.items().length;
   };
 
-  self.remove = function(sku) {
+  self.remove = function(id) {
     self.items.remove(function(item) {
-      return item.sku == sku;
+      return item.id == id;
     });
   };
 
   self.removeClicked = function(item) {
-    self.remove(item.sku);
+    self.remove(item.id);
   };
 
   self.itemCount = function() {
@@ -103,9 +104,9 @@ Snolla.Cart = function(){
     self.items([]);
   };
 
-  self.find = function(sku){
+  self.find = function(id){
     return ko.utils.arrayFirst(self.items(),function(item){
-      return item.sku === sku;
+      return item.id === id;
     });
   };
 
