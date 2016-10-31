@@ -1,13 +1,15 @@
-var Tekpub = Tekpub || {};
-Tekpub.CartItem = function(options,callback){
+var Snolla = Snolla || {};
+Snolla.CartItem = function(options, callback){
   
   var cartItem = {};
   var qty = (options.quantity || 1);
   cartItem.price = options.price || 0.00;
   
   cartItem.quantity = ko.observable(qty).asPositiveInteger(1);
-  
   cartItem.sku = options.sku || "";
+  cartItem.thumb = options.thumb || "";
+  cartItem.url = options.url || "";
+  cartItem.title = options.title || "";
   cartItem.description = options.description || "";
 
   cartItem.priceInPennies = function(){
@@ -19,7 +21,7 @@ Tekpub.CartItem = function(options,callback){
   });
 
   cartItem.discount = ko.computed(function(){
-    return cartItem.quantity() >= 5 ? cartItem.subtotal() * 0.2 : 0;
+    return 0; //cartItem.quantity() >= 5 ? cartItem.subtotal() * 0.2 : 0;
   });
 
   cartItem.lineTotal = ko.computed(function() {
@@ -28,15 +30,16 @@ Tekpub.CartItem = function(options,callback){
 
   if(callback){
     cartItem.quantity.subscribe(function(quantity){
-      callback.call(cartItem,cartItem);
+      callback.call(cartItem,cartItem); //? quantity
     });
   }
+
   return cartItem;
 }
 
-Tekpub.Cart = function(){
+Snolla.Cart = function(){
   var self = this;
-  var stored = JSON.parse(localStorage.getItem("tekpubCart")) || [];
+  var stored = JSON.parse(localStorage.getItem("SnollaCart")) || [];
   self.items = ko.observableArray();
 
   //remove an item if quantity is 0, passed to CartItem
@@ -48,7 +51,7 @@ Tekpub.Cart = function(){
 
   //send the items that we load from storage through the CartItem constructor
   self.items(ko.utils.arrayMap(stored, function(item) {
-     return Tekpub.CartItem(item, self.itemQuantityCheck);
+     return Snolla.CartItem(item, self.itemQuantityCheck);
   }));
 
 
@@ -59,7 +62,7 @@ Tekpub.Cart = function(){
     if(existing){
       existing.quantity(existing.quantity() + parseInt(item.quantity || 1, 10));
     }else{
-      existing = Tekpub.CartItem(item,self.itemQuantityCheck);
+      existing = Snolla.CartItem(item,self.itemQuantityCheck);
       self.items.push(existing); 
     }
     return existing;
@@ -108,8 +111,8 @@ Tekpub.Cart = function(){
 
   //dirty tracking
   ko.computed(function(){
-    localStorage.setItem("tekpubCart",ko.toJSON(self.items));
-  }).extend({throttle : 1});
+    localStorage.setItem("SnollaCart",ko.toJSON(self.items));
+  }).extend({ rateLimit : 1 });
 
   self.hasItems = ko.computed(function(){
     return self.rowCount() > 0;
