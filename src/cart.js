@@ -29,45 +29,47 @@ Snolla.CartItem = function(options, callback){
     return cartItem.subtotal() - cartItem.discount();
   });
 
-  if(callback){
-    cartItem.quantity.subscribe(function(quantity){
-      callback.call(cartItem,cartItem); //? quantity
-    });
-  }
+    if (callback) {
+        cartItem.quantity.subscribe(function(quantity) {
+            callback.call(cartItem, cartItem);
+        });
+    }
 
-  return cartItem;
+    return cartItem;
 }
 
 Snolla.Cart = function(){
-  var self = this;
-  var stored = JSON.parse(localStorage.getItem("SnollaCart")) || [];
-  self.items = ko.observableArray();
+    var self = this;
+    self.items = ko.observableArray();
 
-  //remove an item if quantity is 0, passed to CartItem
-  self.itemQuantityCheck = function(item) {
-      if (item && item.quantity() === 0) {
-          self.items.remove(item);
-      }
-  };
+    //remove an item if quantity is 0, passed to CartItem
+    self.itemQuantityCheck = function(item) {
+        if (item && item.quantity() === 0) {
+            self.items.remove(item);
+        }
+    };
 
-  //send the items that we load from storage through the CartItem constructor
-  self.items(ko.utils.arrayMap(stored, function(item) {
-     return Snolla.CartItem(item, self.itemQuantityCheck);
-  }));
+    self.load = function() {
+        var stored = JSON.parse(localStorage.getItem("SnollaCart")) || [];
+        //send the items that we load from storage through the CartItem constructor
+        self.items(ko.utils.arrayMap(stored, function (item) {
+            return Snolla.CartItem(item, self.itemQuantityCheck);
+        }));
+    };
 
+    self.load();
 
-  self.addItem = function(item){
-    var existing = self.find(item.id);
-    var items = self.items();
-
-    if(existing){
-      existing.quantity(existing.quantity() + parseInt(item.quantity || 1, 10));
-    }else{
-      existing = Snolla.CartItem(item,self.itemQuantityCheck);
-      self.items.push(existing); 
-    }
-    return existing;
-  };
+    self.addItem = function (item) {
+        self.load();
+        var existing = self.find(item.id);
+        if (existing) {
+            existing.quantity(existing.quantity() + parseInt(item.quantity || 1, 10));
+        } else {
+            existing = Snolla.CartItem(item,self.itemQuantityCheck);
+            self.items.push(existing); 
+        }
+        return existing;
+    };
   
 
   self.rowCount = function() {
@@ -76,7 +78,7 @@ Snolla.Cart = function(){
 
   self.remove = function(id) {
     self.items.remove(function(item) {
-      return item.id == id;
+      return item.id === id;
     });
   };
 
@@ -123,7 +125,20 @@ Snolla.Cart = function(){
   self.isNumber = function(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
-  return self;
 
+    self.showItem = function(elem) {
+        if (elem.nodeType === 1) {
+            $(elem).hide().slideDown();
+        }
+    };
 
+    self.hideItem = function(elem) {
+        if (elem.nodeType === 1) {
+            $(elem).slideUp(function() {
+                $(elem).remove();
+            });
+        }
+    };
+
+    return self;
 }
